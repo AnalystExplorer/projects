@@ -1,12 +1,14 @@
 import streamlit as st 
 import smtplib as s 
 import os
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email import encoders
 from email.mime.base import MIMEBase
 
+    
 def main():
     st.title("Email Sender Web Application")
     st.write("Build with streamlit and python")
@@ -18,20 +20,24 @@ def main():
     password= st.text_input("Enter User Password-",type="password")
     email_reciever=st.text_input("Enter Reciever Email- ")
     subject=st.text_input("your Email Subject- ")
-    body=st.text_area("Your Email body- ")
+    email_message=st.text_area("Your Email body- ")
     #upload your database
-    fl=st.file_uploader(":file_folder: Upload a file to attach in the email", type=(["csv","txt","xlsx","xls"]))
-
+    attachment=st.file_uploader(":file_folder: Upload a file to attach in the email",
+                        type=(["csv","txt","xlsx","xls"]))
+    
+    
+   
+    
     
     if st.button("Send Email"):
             try:
                 connection=s.SMTP('smtp.gmail.com',587)
                 connection.starttls()
                 connection.login(email_sender,password)
-                message="Subject:{}\n\n{}".format(subject,body)
+                message="Subject:{}\n\n{}".format(subject,email_message)
                 connection.sendmail(email_sender,
                                     email_reciever,
-                                    fl,
+                                    attachment,
                                     message)
                 connection.quit()
                 st.success("Email Send Successfully.")
