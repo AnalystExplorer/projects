@@ -22,26 +22,26 @@ def main():
     subject=st.text_input("your Email Subject- ")
     email_message=st.text_area("Your Email body- ")
     fl=st.file_uploader(":file_folder: Upload a file", type=(["csv","txt","xlsx","xls"]))
+    # Get the list of filenames in the current directory
+    
     if st.button("Send Email"):
             try:
                 connection=s.SMTP('smtp.gmail.com',587)
                 connection.starttls()
                 connection.login(email_sender,password)
-                message="Subject:{}\n\n{}".format(subject,email_message)
-                connection.sendmail(email_sender,
-                                    email_reciever,
-                                     message)
+                message="Subject:{}\n\n{}".format(subject,email_message,fl)
                 for fl in os.listdir():
-                    if fl == 'sending_email.py':
+                    if fl:
                         continue
                     with open(fl,'rb') as f:
                         file_data = f.read()
-                        file_name = f.name
-                        message.add_attachment(file_data, 
-                                               maintype = 'application', 
-                                               subtype = 'octet-stream',
-                                               filename= file_name)
-                
+                        file_name= f.name()
+                        message.add_attachment(file_data,
+                                               
+                                               subtype='octet-stream',
+                                               fl= file_name)
+                        
+                connection.sendmail(email_sender,email_reciever,message)
                 connection.quit()
                 st.success("Email Send Successfully.")
                 #speak("Email Send Successfully.")
