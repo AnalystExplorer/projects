@@ -21,14 +21,7 @@ def main():
     email_reciever=st.text_input("Enter Reciever Email- ")
     subject=st.text_input("your Email Subject- ")
     email_message=st.text_area("Your Email body- ")
-    #upload your database
-    attachment=st.file_uploader(":file_folder: Upload a file to attach in the email",
-                        type=(["csv","txt","xlsx","xls"]))
-    
-    
-   
-    
-    
+    fl=st.file_uploader(":file_folder: Upload a file", type=(["csv","txt","xlsx","xls"]))
     if st.button("Send Email"):
             try:
                 connection=s.SMTP('smtp.gmail.com',587)
@@ -37,8 +30,18 @@ def main():
                 message="Subject:{}\n\n{}".format(subject,email_message)
                 connection.sendmail(email_sender,
                                     email_reciever,
-                                    attachment,
-                                    message)
+                                     message)
+                for fl in os.listdir():
+                    if fl == 'sending_email.py':
+                        continue
+                    with open(fl,'rb') as f:
+                        file_data = f.read()
+                        file_name = f.name
+                        message.add_attachment(file_data, 
+                                               maintype = 'application', 
+                                               subtype = 'octet-stream',
+                                               filename= file_name)
+                
                 connection.quit()
                 st.success("Email Send Successfully.")
                 #speak("Email Send Successfully.")
