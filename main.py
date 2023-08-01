@@ -22,20 +22,20 @@ temp_min = []
 wind = []
 weather = []
 
-for date1,prediction1,temp_max1,temp_min1,wind1,weather1 in myresult:
-    date.append(date1)
-    prediction.append(prediction1)
-    temp_max.append(temp_max1)
-    temp_min.append(temp_min1)
-    wind.append(wind1)
-    weather.append(weather1)
+for Date,Precipitation,Temp_max,Temp_min,Wind,Weather in myresult:
+    date.append(Date)
+    prediction.append(Precipitation)
+    temp_max.append(Temp_max)
+    temp_min.append(Temp_min)
+    wind.append(Wind)
+    weather.append(Weather)
 
-dic={'date1' : date, 
-     'prediction1' : prediction, 
-     'temp_max1' : temp_max, 
-     'temp_min1': temp_min,
-     'wind1' : wind,
-     'weather1' : weather
+dic={'Date' : date, 
+     'Precipitation' : prediction, 
+     'Temp_max' : temp_max, 
+     'Temp_min': temp_min,
+     'Wind' : wind,
+     'Weather' : weather
      }
 
 df=pd.DataFrame(dic)
