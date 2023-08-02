@@ -1,98 +1,100 @@
-#import all required libraries
-import streamlit as st 
-import smtplib as s 
+import streamlit as st
+import smtplib as s
 import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email import encoders
 from email.mime.base import MIMEBase
-import environ
-from os.path import join,dirname, abspath
 
-env = environ.Env()
-
-env.read_env(env.str(
-    'ENV_PATH',
-    join(dirname(dirname(abspath(__file__))), '.env'
-         )
-))
-
-SMTP_SERVER_ADDRESS = os.environ.get('SMTP_SERVER_ADDRESS')
-PORT = os.environ.get('PORT')
-SENDER_PASSWORD = os.environ.get('SENDER_PASSWORD')
-SENDER_ADDRESS = os.environ.get('SENDER_ADDRESS')
-
-SENDER_ADDRESS = "swatikumari@mba.christuniversity.in"
-PORT = 587
-SMTP_SERVER_ADDRESS = "smtp.gmail.com"
-SENDER_PASSWORD = "Bangalore@123"
-
-
-
-
-#define function to create message
-def send_email(sender,receiver, smtp_server, smtp_port,email_message,subject,attachment=None):
-    
-    
-    message = MIMEMultipart()
-    message['TO'] = receiver
-    message['Subject'] = subject
-    message.attach(MIMEText(email_message,'plain','utf-8'))
-    
-    if attachment:
-        att=MIMEApplication(attachment.read(),_subtype="text")
-        att.add_header('content-Disposition', 'attachment', filename=attachment.name)
-        message.attach(att)
+def email_send(sender_email,sender_pwd,reciever_email,smtp_server,subject,email_message,attachment_file=None):
+    try:
+        #setup the smtp server
+        smtp_server = 'smtp.gmail.com'
+        port=587
+        #create connection to server
+        server = s.SMTP(smtp_server, port)
+        server.starttls()
         
-    
-    
-#define function to create form
+        #login to the smtp server using sender email and pwd
+        server.login(sender_email,sender_pwd)
+        
+        #create the email message
+        message=MIMEMultipart()
+        message['from']=sender_email
+        message['to']=reciever_email
+        message['subject']=subject
+        message['message']=email_message
+        
+        #attach the body of the mail
+        message.attach(MIMEText('email_message','plain'))
+        
+        # Attach the file
+        if attachment_file:
+            with open(attachment_file, "rb") as attachment:
+                part = MIMEApplication(attachment.read())
+                part.add_header(
+                    "Content-Disposition",
+                    f"attachment; filename= {attachment_file}"
+                )
+                message.attach(part)
+                
+                
+        
+        server.sendmail(sender_email, reciever_email, message.as_string())
+
+        # Close the connection
+        server.quit()
+
+        st.success("Email sent successfully!")
+        
+    except Exception as e:
+        st.success(f"Failed to send email. Error: {e}")
+        
+
+#create form to take inputs from user
+
 def main():
-    with st.form("Email Form"):
-        subject = st.text_input(label='Subject', placeholder="Please enter of your email subject")
-        
-        fullName = st.text_input(label = 'Full Name',placeholder="Please Enter your full name")
-        rcv_email = st.text_input(label= ' Reciever Email Id', placeholder="Please Enter receiver email id")
-        text = st.text_input(label='Email Text', placeholder="Please enter your text here")
-        upload_file = st.file_uploader("attachment")
-        submit_res = st.form_submit_button(label='send')
-        
-
-   if st.button("Send Email"):
-            try:
-                connection=s.SMTP('smtp.gmail.com',587)
-                connection.starttls()
-                connection.login(email_sender,password)
-                message="Subject:{}\n\n{}".format(subject,body)
-                connection.sendmail(email_sender,
-                                    email_reciever,
-                                    fl,
-                                    message)
-                connection.quit()
-                st.success("Email Send Successfully.")
-                #speak("Email Send Successfully.")
-            except Exception as e:
-                if email_sender=="":
+    st.title("Email form")
+    sender_email = st.text_input("Enter sender Email-")
+    sender_pwd = st.text_input("Enter sender password-",type="password")
+    reciever_email = st.text_input("Enter reciever email id- ")
+    subject = st.text_input("enter subject-")
+    email_message = st.text_area("Enter the email body- ")
+    attachment_file = st.file_uploader("Enter the file to upload ")
+    if st.button("Send Email"):
+        if sender_email=="":
                     st.error("Please Fill User Email Field")
                     #speak("Please Fill User Email Field")
-                elif password=="":
+        elif sender_pwd=="":
                     st.error("please Fill Password Field")
                     #speak("Please Fill password Field")
-                elif email_reciever=="":
+        elif reciever_email=="":
                     st.error("Please Fill Reciever Email Field")
                     #speak("Please Fill Reciever Email Field")
-                else:
-                    a=os.system("ping www.google.com")
-                    if a==1:
-                        st.error("Please Connect Your Internet connection")
+        else:
+                a=os.system("ping www.google.com")
+                if a==1:
+                    st.error("Please Connect Your Internet connection")
                         #speak("Please Connect Your Internet connection")
-                    else:
-                        st.error("Wrong Email or Password-!")
+                else:
+                    st.error("Wrong Email or Password-!")
                         #speak("Wrong Email or Password.!")
-            else:
+    else:
                 st.markdown("this application is developed by####")
     
-
-if __name__ == "__main__":
+    email_send(sender_email,sender_pwd,reciever_email,subject,email_message,attachment_file)
+    
+    
+if __name__ == '__main__':
     main()
+    
+
+
+
+        
+
+ 
+ 
+    
+    

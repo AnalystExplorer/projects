@@ -8,6 +8,7 @@ from email.mime.application import MIMEApplication
 from email import encoders
 from email.mime.base import MIMEBase
 
+
     
 def main():
     st.title("Email Sender Web Application")
@@ -21,6 +22,7 @@ def main():
     email_reciever=st.text_input("Enter Reciever Email- ")
     subject=st.text_input("your Email Subject- ")
     email_message=st.text_area("Your Email body- ")
+    
     fl=st.file_uploader(":file_folder: Upload a file", type=(["csv","txt","xlsx","xls"]))
     # Get the list of filenames in the current directory
     
