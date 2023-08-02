@@ -1,73 +1,94 @@
 import streamlit as st 
-import smtplib as s 
-import os
-
+import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-from email import encoders
-from email.mime.base import MIMEBase
+import os
 
+def send_email(email, password, send_to_email, cc_mails, bcc_mails, subject, body, attachment_file_path):
+    try:
+        # Set up the SMTP server
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587  # SMTP port (587 is for TLS)
 
-    
-def main():
-    st.title("Email Sender Web Application")
-    st.write("Build with streamlit and python")
-    #activities=["send Email","about"]
-    #choice=st.sidebar.selectbox("select activities", activities)
-    #if choice== "send email":
-        
-    email_sender=st.text_input("Enter User Email - ")
-    password= st.text_input("Enter User Password-",type="password")
-    email_reciever=st.text_input("Enter Reciever Email- ")
-    subject=st.text_input("your Email Subject- ")
-    email_message=st.text_area("Your Email body- ")
-    
-    fl=st.file_uploader(":file_folder: Upload a file", type=(["csv","txt","xlsx","xls"]))
-    # Get the list of filenames in the current directory
-    
-    if st.button("Send Email"):
-            try:
-                connection=s.SMTP('smtp.gmail.com',587)
-                connection.starttls()
-                connection.login(email_sender,password)
-                message="Subject:{}\n\n{}".format(subject,email_message,fl)
-                for fl in os.listdir():
-                    if fl:
-                        continue
-                    with open(fl,'rb') as f:
-                        file_data = f.read()
-                        file_name= f.name()
-                        message.add_attachment(file_data,
-                                               
-                                               subtype='octet-stream',
-                                               fl= file_name)
-                        
-                connection.sendmail(email_sender,email_reciever,message)
-                connection.quit()
-                st.success("Email Send Successfully.")
+        # Create a connection to the server
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+
+        # Log in to the SMTP server using your credentials
+        server.login(email, password)
+
+        # Create the email message
+        message = MIMEMultipart()
+        message['From'] = email
+        message['To'] = send_to_email
+        message['Cc'] = cc_mails if cc_mails else ''
+        message['Bcc'] = bcc_mails if bcc_mails else ''
+        message['Subject'] = subject
+
+        # Attach the body of the email
+        message.attach(MIMEText(body, 'plain'))
+
+        # Attach the file
+        if attachment_file_path:
+            with open(attachment_file_path, "rb") as attachment:
+                part = MIMEApplication(attachment.read())
+                part.add_header(
+                    "Content-Disposition",
+                    f"attachment; filename= {attachment_file_path}"
+                )
+                message.attach(part)
+
+        # Send the email
+        recipients = [send_to_email]
+        if cc_mails:
+            recipients += cc_mails.split(",")
+        if bcc_mails:
+            recipients += bcc_mails.split(",")
+
+        server.sendmail(email, recipients, message.as_string())
+
+        # Close the connection
+        server.quit()
+
+        print("Email sent successfully!")
+
+    except Exception as e:
+        print(f"Failed to send email. Error: {e}")
+
+# Get input from the user
+email = st.text_input("Enter your email address: ")
+password = st.text_input("Enter your email password: ")
+send_to_email = st.text_input("Enter reciever's email address: ")
+cc_mails = st.text_input("Enter CC email addresses separated by commas, press Enter to skip: ")
+bcc_mails = st.text_input("Enter BCC email addresses separated by commas, press Enter to skip): ")
+subject = "Weekly-report"
+body = "Hii,\n PFA report for your references. \n\n Thank you for your time and consideration.\n\n Regards,\n Swati Kumari"
+attachment_file_path = st.file_uploader("Enter the file path of the attachment, press Enter to skip: ")
+if st.button("Send Email"):
+    try:
+        st.success("Email Send Successfully.")
                 #speak("Email Send Successfully.")
-            except Exception as e:
-                if email_sender=="":
-                    st.error("Please Fill User Email Field")
+    except Exception as e:
+        if email=="":
+            st.error("Please Fill User Email Field")
                     #speak("Please Fill User Email Field")
-                elif password=="":
-                    st.error("please Fill Password Field")
+        elif password=="":
+            st.error("please Fill Password Field")
                     #speak("Please Fill password Field")
-                elif email_reciever=="":
-                    st.error("Please Fill Reciever Email Field")
+        elif send_to_email=="":
+            st.error("Please Fill Reciever Email Field")
                     #speak("Please Fill Reciever Email Field")
-                else:
-                    a=os.system("ping www.google.com")
-                    if a==1:
-                        st.error("Please Connect Your Internet connection")
+        else:
+            a= os.system("ping www.google.com")
+            if a==1:
+                st.error("Please Connect Your Internet connection")
                         #speak("Please Connect Your Internet connection")
-                    else:
-                        st.error("Wrong Email or Password-!")
-                        #speak("Wrong Email or Password.!")
             else:
-                st.markdown("this application is developed by####")
-    
+                st.error("Wrong Email or Password-!")
+                        #speak("Wrong Email or Password.!")
+    else:
+        st.markdown("this application is developed by####")
 
-if __name__ == "__main__":
-    main()
+# Send the email
+send_email(email, password, send_to_email, cc_mails, bcc_mails, subject, body, attachment_file_path)
