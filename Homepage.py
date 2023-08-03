@@ -228,52 +228,6 @@ with st.expander("view Data of TimeSeries: "):
     csv = linechart.to_csv(index=False).encode("utf-8")
     st.download_button('Download Data', data = csv, file_name = "TimeSeries.csv") 
 
-###for temp_min
-df["month_year"] = df["Date"].dt.to_period("Y")
-st.subheader('Time Series Analysis for minimum temperature for the year')
-
-linechart = pd.DataFrame(df.groupby(df["month_year"].dt.strftime("%Y : %b"))
-                         ["Temp_min"].min()).reset_index()
-fig2=px.line(linechart, 
-             x="month_year" ,
-             y="Temp_min", 
-             height=500, 
-             width = 1000, 
-             template="gridon")
-
-st.plotly_chart(fig2,use_container_width=True)
-#download the data based on the chart
-with st.expander("view Data of TimeSeries: "):
-    st.write(linechart.T.style.background_gradient(cmap="Blues"))
-    csv = linechart.to_csv(index=False).encode("utf-8")
-    st.download_button('Download Data', data = csv, file_name = "TimeSeries0.csv")
-     
-###for temp_max
-df["month_year"] = df["Date"].dt.to_period("Y")
-st.subheader('Time Series Analysis for maximum temperature for Year')
-
-linechart = pd.DataFrame(df.groupby(df["month_year"].dt.strftime("%Y : %b"))
-                         ["Temp_max"].max()).reset_index()
-fig2=px.line(linechart, 
-             x="month_year" ,
-             y="Temp_max", 
-             height=500, 
-             width = 1000, 
-             template="gridon")
-
-st.plotly_chart(fig2,use_container_width=True)
-#download the data based on the chart
-with st.expander("view Data of TimeSeries: "):
-    st.write(linechart.T.style.background_gradient(cmap="Blues"))
-    csv = linechart.to_csv(index=False).encode("utf-8")
-    st.download_button('Download Data', data = csv, file_name = "TimeSeries1.csv") 
-
-
-
-
-
-
-
 
 
 
