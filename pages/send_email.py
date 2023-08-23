@@ -5,6 +5,13 @@ from email.mime.text import MIMEText
 from email import encoders
 import streamlit as st
 
+
+#remove watermark
+hide_st_style = """<style>
+footer {visibility: hidden;}
+</style>"""
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 # Streamlit file uploader
 filename = st.file_uploader(":file_folder: Upload a file", type=(["csv","txt","xlsx","xls"]))
 receiver_email = st.text_input("Enter receiver email-")
